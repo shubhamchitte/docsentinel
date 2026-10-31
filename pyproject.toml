@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docsentinel"
+version = "0.1.0"
+description = "Flag and fix docs made stale by code changes; serve docs checked against current code."
+requires-python = ">=3.10"
+dependencies = ["pyyaml==6.0.3"]
+
+[project.optional-dependencies]
+mcp = ["mcp==2.3.0"]
+
+[project.scripts]
+docsentinel = "docsentinel.cli:run"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["docsentinel"]
+
+[tool.setuptools.package-data]
+docsentinel = ["prompts/*.md"]
