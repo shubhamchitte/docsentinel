@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The section only describes the PYTHON_DOTENV_DISABLED env var, which the new code still honors; it doesn't mention the changed override or interpolate defaults.",
+    "stale_lines": []
+  }
+}

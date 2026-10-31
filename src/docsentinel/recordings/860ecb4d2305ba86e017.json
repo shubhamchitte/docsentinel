@@ -1,0 +1,6 @@
+{
+  "data": {
+    "replacements": [],
+    "summary": "No change made: the new code is empty, so I can't tell what replaced `find_dotenv` or how the IPython `%dotenv` search now works, and any rewrite of line 122 would be a guess."
+  }
+}

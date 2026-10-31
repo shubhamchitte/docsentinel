@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.9,
+    "reason": "The section only describes how variables without values are handled (None in dotenv_values, ignored by load_dotenv), and the changed defaults for interpolate and override don't affect that behavior.",
+    "stale_lines": []
+  }
+}

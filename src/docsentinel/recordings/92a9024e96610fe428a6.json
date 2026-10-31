@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.93,
+    "reason": "The section says load_dotenv ignores variables without a value, which is unrelated to the override default change, so every statement still holds.",
+    "stale_lines": []
+  }
+}

@@ -1,0 +1,10 @@
+name: add_function
+description: New public function added with no docs. Expect a GAP, no stale sections.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: "def _is_file_or_fifo("
+    replace: "def dotenv_keys(path):\n    return list(dotenv_values(path))\n\n\ndef _is_file_or_fifo("
+expect:
+  stale: []
+  gaps: [dotenv_keys]

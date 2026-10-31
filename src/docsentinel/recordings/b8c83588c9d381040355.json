@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.93,
+    "reason": "The section only says both functions accept a `stream` argument and shows a simple load_dotenv(stream=...) call; neither the override nor the interpolate default is mentioned, so every statement remains true.",
+    "stale_lines": []
+  }
+}

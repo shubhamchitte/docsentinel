@@ -1,0 +1,9 @@
+name: cli_option_rename
+description: CLI option `list --format` renamed to `--output`.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/cli.py]
+    find: '"--format",'
+    replace: '"--output",'
+expect:
+  stale: ["README.md#Command-line Interface"]

@@ -1,0 +1,10 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.95,
+    "reason": "The README says to set `PYTHON_DOTENV_DISABLED=1`, but the new code checks the `DOTENV_DISABLED` environment variable, so the documented variable name is wrong.",
+    "stale_lines": [
+      143
+    ]
+  }
+}

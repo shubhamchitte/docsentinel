@@ -1,0 +1,9 @@
+name: env_var_rename
+description: Environment variable PYTHON_DOTENV_DISABLED renamed to DOTENV_DISABLED.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: PYTHON_DOTENV_DISABLED
+    replace: DOTENV_DISABLED
+expect:
+  stale: ["README.md#Disable load_dotenv"]

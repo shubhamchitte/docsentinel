@@ -1,0 +1,11 @@
+{
+  "data": {
+    "replacements": [
+      {
+        "line": 49,
+        "new_text": "- **Override** existing environment variables (`override=True`). Pass `override=False` to keep existing variables."
+      }
+    ],
+    "summary": "Updated the README Getting Started section to say load_dotenv() now overrides existing environment variables by default (override=True) and that override=False keeps them."
+  }
+}

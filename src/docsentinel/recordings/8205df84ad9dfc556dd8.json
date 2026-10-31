@@ -1,0 +1,6 @@
+{
+  "data": {
+    "approve": false,
+    "problem": "Lines 157-158 and 161-162 reverse the output order to EMAIL before USER, but the given code change (only `output_format`) doesn't show that `list` now sorts or reorders keys, so the new ordering can't be confirmed."
+  }
+}

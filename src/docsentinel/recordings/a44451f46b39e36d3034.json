@@ -1,0 +1,13 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.95,
+    "reason": "The text says \"`load_dotenv` and `dotenv_values` accept streams via their `stream` argument\" and the example calls `load_dotenv(stream=config)`, but the new signatures no longer have a `stream` parameter, so that call would raise a TypeError.",
+    "stale_lines": [
+      107,
+      108,
+      109,
+      117
+    ]
+  }
+}

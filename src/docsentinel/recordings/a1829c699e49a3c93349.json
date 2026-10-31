@@ -1,0 +1,10 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.8,
+    "reason": "The doc says PYTHON_DOTENV_DISABLED stops `load_dotenv()` from loading \".env files or streams\", but the `stream` parameter was removed from the signature, so load_dotenv no longer loads streams.",
+    "stale_lines": [
+      144
+    ]
+  }
+}

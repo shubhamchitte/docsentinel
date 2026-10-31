@@ -1,0 +1,15 @@
+{
+  "data": {
+    "replacements": [
+      {
+        "line": 49,
+        "new_text": "- **Override** existing environment variables (`override=True`). Pass `override=False` to keep existing variables."
+      },
+      {
+        "line": 70,
+        "new_text": "Variables in values are only expanded if you pass `interpolate=True` to `load_dotenv()`. If you use variables in values, ensure they are surrounded with `{` and `}`,"
+      }
+    ],
+    "summary": "Updated the README Getting Started section to reflect that `load_dotenv()` now overrides existing variables by default (`override=True`) and only expands variables when `interpolate=True` is passed."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.93,
+    "reason": "The section only calls dotenv_values(\".env\") with a positional dotenv_path, which still works after `stream` was removed, and nothing in it mentions `stream`.",
+    "stale_lines": []
+  }
+}

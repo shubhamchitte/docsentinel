@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.93,
+    "reason": "The section never mentions the removed `stream` parameter; its statements about `load_dotenv()` defaults (find .env, set os.environ, override=False) remain true.",
+    "stale_lines": []
+  }
+}

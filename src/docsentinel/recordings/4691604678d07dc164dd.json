@@ -1,0 +1,37 @@
+{
+  "data": {
+    "answer": "Use `read_dotenv()`. It parses a .env file and returns a dict without touching `os.environ`. Pass `dotenv_path` for a specific file, or `stream` for a StringIO. If you pass neither, it searches for a .env with `find_dotenv()`. Keys with no value (e.g. a bare `FOO`) map to `None`, and `interpolate=True` by default, so `${VAR}` references are expanded.",
+    "snippet": "from dotenv import read_dotenv\n\nconfig = read_dotenv(\".env\")   # dict; os.environ is untouched\nprint(config)\n\n# From a stream:\nfrom io import StringIO\nprint(read_dotenv(stream=StringIO(\"A=1\\nB=${A}2\\nC\\n\")))\n# {'A': '1', 'B': '12', 'C': None}",
+    "citations": [
+      {
+        "file": "src/dotenv/main.py",
+        "line": 438
+      },
+      {
+        "file": "src/dotenv/main.py",
+        "line": 445
+      },
+      {
+        "file": "src/dotenv/main.py",
+        "line": 462
+      },
+      {
+        "file": "src/dotenv/main.py",
+        "line": 465
+      },
+      {
+        "file": "src/dotenv/__init__.py",
+        "line": 3
+      },
+      {
+        "file": "src/dotenv/__init__.py",
+        "line": 45
+      }
+    ],
+    "warnings": [
+      "README.md 'Load configuration without altering the environment' (lines 80-104) uses `dotenv_values`. That name no longer exists. Use `read_dotenv`; it is the only one exported from `dotenv/__init__.py`. The same applies to the 'Parse configuration as a stream', 'Variable without a value' and 'Variable expansion' sections.",
+      "README.md line 49 says `load_dotenv` does not override existing variables by default. That is stale per the drift report. I did not verify the `load_dotenv` default in code, since it is not needed for this question. `read_dotenv` never modifies os.environ either way."
+    ],
+    "confidence": 0.93
+  }
+}

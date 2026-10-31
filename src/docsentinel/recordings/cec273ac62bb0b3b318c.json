@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The section only describes PYTHON_DOTENV_DISABLED=1 disabling load_dotenv(), which the new code still does; it says nothing about the changed override or interpolate defaults.",
+    "stale_lines": []
+  }
+}

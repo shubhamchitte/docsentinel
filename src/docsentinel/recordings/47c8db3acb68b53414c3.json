@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.97,
+    "reason": "The change only renames an internal helper (_walk_to_root to _iter_parents); the README's statements about using find_dotenv and specifying a path are still true.",
+    "stale_lines": []
+  }
+}

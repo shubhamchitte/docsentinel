@@ -1,0 +1,15 @@
+{
+  "data": {
+    "replacements": [
+      {
+        "line": 218,
+        "new_text": "With `load_dotenv(override=True, interpolate=True)` or `dotenv_values(interpolate=True)`, the value of a variable"
+      },
+      {
+        "line": 226,
+        "new_text": "With `load_dotenv(override=False, interpolate=True)`, the value of a variable is the first of the"
+      }
+    ],
+    "summary": "Documented that variable expansion now requires passing `interpolate=True`, since it defaults to False in `load_dotenv` and `dotenv_values`."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.85,
+    "reason": "The section describes dotenv_values returning a dict and merging with os.environ, none of which depends on load_dotenv's override default, so every statement is still true.",
+    "stale_lines": []
+  }
+}

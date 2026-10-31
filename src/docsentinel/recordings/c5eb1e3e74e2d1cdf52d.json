@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.85,
+    "reason": "The section never mentions the `override` or `interpolate` defaults. Its claims still hold: `dotenv_values` returns a dict without touching the environment, and the merge example is unaffected by the default changes.",
+    "stale_lines": []
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The section only says both functions accept a `stream` argument and shows a stream example that doesn't depend on the `override` or `interpolate` defaults, so every statement is still true.",
+    "stale_lines": []
+  }
+}

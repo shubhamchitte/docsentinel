@@ -1,0 +1,6 @@
+{
+  "data": {
+    "replacements": [],
+    "summary": "No change made: the new signatures drop `stream`, so this whole section documents a removed feature (while the docstrings still mention `stream`), and the right fix, deleting or rewriting the section, can't be done with line edits."
+  }
+}

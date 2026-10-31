@@ -1,0 +1,6 @@
+{
+  "data": {
+    "replacements": [],
+    "summary": "No change made: the new signatures drop `stream` from `load_dotenv` and `dotenv_values`, so this whole section describes a removed feature and should be deleted by a person, and the code gives no replacement way to load from a stream."
+  }
+}

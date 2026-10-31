@@ -1,0 +1,18 @@
+name: behavior_defaults
+description: >
+  Reasoning-only case: no names change, only defaults. Variable expansion is off
+  by default (interpolate True -> False) and load_dotenv overrides by default.
+  Rules can only say "this section mentions the function"; the Judge must read
+  each section to decide. Expected answers were written before the first run.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: "    interpolate: bool = True,"
+    replace: "    interpolate: bool = False,"
+  - files: [src/dotenv/main.py]
+    find: "    override: bool = False,"
+    replace: "    override: bool = True,"
+expect:
+  stale:
+    - "README.md#Getting Started"      # line 49 override; ${DOMAIN} expansion example
+    - "README.md#Variable expansion"   # "can interpolate" now needs interpolate=True

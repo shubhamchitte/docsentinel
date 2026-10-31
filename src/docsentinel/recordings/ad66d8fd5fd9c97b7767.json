@@ -1,0 +1,15 @@
+{
+  "data": {
+    "replacements": [
+      {
+        "line": 49,
+        "new_text": "- **Override** existing environment variables (`override=True`). Pass `override=False` to keep existing variables."
+      },
+      {
+        "line": 70,
+        "new_text": "If you use variables in values, pass `interpolate=True` to `load_dotenv()` and ensure they are surrounded with `{` and `}`,"
+      }
+    ],
+    "summary": "Update the README Getting Started section for the new defaults: `override=True` now overrides existing environment variables, and variable expansion like `${DOMAIN}` requires `interpolate=True`."
+  }
+}

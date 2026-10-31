@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.93,
+    "reason": "The section only says both functions accept a `stream` argument and shows a basic `load_dotenv(stream=config)` call, which still works and says nothing about the `override` or `interpolate` defaults.",
+    "stale_lines": []
+  }
+}

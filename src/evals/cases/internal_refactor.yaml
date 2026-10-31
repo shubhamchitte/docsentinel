@@ -1,0 +1,9 @@
+name: internal_refactor
+description: Trap. Private helper renamed; docs must not be flagged.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: _walk_to_root
+    replace: _iter_parents
+expect:
+  stale: []

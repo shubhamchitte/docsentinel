@@ -1,0 +1,14 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.95,
+    "reason": "Line 49 says load_dotenv will \"Not override existing environment variables (`override=False`)\", but the new default is override=True; lines 66-71 also show ${DOMAIN} expansion, which no longer happens by default because interpolate now defaults to False.",
+    "stale_lines": [
+      49,
+      66,
+      67,
+      70,
+      71
+    ]
+  }
+}

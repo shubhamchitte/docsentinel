@@ -1,0 +1,10 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.97,
+    "reason": "Line 49 says \"**Not override** existing environment variables (`override=False`). Pass `override=True` to override\", but the new default is `override=True`, so existing variables are overridden by default.",
+    "stale_lines": [
+      49
+    ]
+  }
+}

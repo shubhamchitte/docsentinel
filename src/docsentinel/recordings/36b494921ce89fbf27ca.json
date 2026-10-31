@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The section only describes PYTHON_DOTENV_DISABLED disabling load_dotenv(), which is unchanged and doesn't mention the `override` default.",
+    "stale_lines": []
+  }
+}

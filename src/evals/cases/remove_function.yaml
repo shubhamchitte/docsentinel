@@ -1,0 +1,9 @@
+name: remove_function
+description: find_dotenv made private (removed from public API). Needs an LLM rewrite, not a rename.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: "def find_dotenv("
+    replace: "def _find_dotenv("
+expect:
+  stale: ["README.md#Load .env files in IPython"]

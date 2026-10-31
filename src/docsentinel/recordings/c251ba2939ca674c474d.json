@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.55,
+    "reason": "The section only says python-dotenv \"can\" interpolate and names `override=True`/`override=False` explicitly, so it never claims the old defaults and nothing in it is contradicted by the new defaults (`interpolate=False`, `override=True`).",
+    "stale_lines": []
+  }
+}

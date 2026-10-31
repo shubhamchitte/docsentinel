@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.97,
+    "reason": "The change only renames the disable environment variable (PYTHON_DOTENV_DISABLED to DOTENV_DISABLED), and this section on variable expansion precedence never mentions it, so every statement is still true.",
+    "stale_lines": []
+  }
+}

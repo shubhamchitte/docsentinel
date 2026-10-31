@@ -1,0 +1,6 @@
+{
+  "data": {
+    "replacements": [],
+    "summary": "No change made: line 143 of the section already says `DOTENV_DISABLED=1`, which matches the new code, so the reported `PYTHON_DOTENV_DISABLED` name doesn't appear in this section."
+  }
+}

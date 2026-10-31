@@ -1,0 +1,19 @@
+{
+  "data": {
+    "replacements": [
+      {
+        "line": 216,
+        "new_text": "python-dotenv can interpolate variables using POSIX variable expansion, when `interpolate=True` is passed (the default is `False`)."
+      },
+      {
+        "line": 218,
+        "new_text": "With `load_dotenv(override=True, interpolate=True)` or `dotenv_values(interpolate=True)`, the value of a variable"
+      },
+      {
+        "line": 226,
+        "new_text": "With `load_dotenv(override=False, interpolate=True)`, the value of a variable is the first of the"
+      }
+    ],
+    "summary": "Documented that variable expansion requires interpolate=True since it now defaults to False, and updated the examples in the Variable expansion section accordingly."
+  }
+}

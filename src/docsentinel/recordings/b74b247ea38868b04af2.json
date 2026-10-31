@@ -1,0 +1,12 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.6,
+    "reason": "Lines 218-232 describe how variables are resolved with plain `load_dotenv(override=True)`, `dotenv_values()` and `load_dotenv(override=False)`. In the new code `interpolate` defaults to False, so none of those calls expand variables unless `interpolate=True` is passed, and the text never says so.",
+    "stale_lines": [
+      216,
+      218,
+      226
+    ]
+  }
+}

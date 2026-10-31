@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.85,
+    "reason": "The section never mentions the interpolate or override defaults, and its examples (a plain dotenv_values call and merging dicts with os.environ last) behave as described under the new defaults.",
+    "stale_lines": []
+  }
+}

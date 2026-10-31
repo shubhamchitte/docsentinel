@@ -1,0 +1,37 @@
+{
+  "data": {
+    "answer": "Use `read_dotenv` from `dotenv`. It parses the file and returns a dict without touching `os.environ`. Pass a path, or a `stream`. If you pass neither, it uses `find_dotenv()` to locate the file. Keys with no value (a bare `FOO` line) come back as `None`. Interpolation of `${VAR}` is on by default, and you can turn it off with `interpolate=False`.",
+    "snippet": "from io import StringIO\nfrom dotenv import read_dotenv\n\nconfig = read_dotenv(\".env\")  # e.g. {\"USER\": \"foo\", \"EMAIL\": \"foo@example.org\"}\n\n# or from a stream, without interpolation:\nconfig2 = read_dotenv(stream=StringIO(\"A=1\\nB\"), interpolate=False)  # {\"A\": \"1\", \"B\": None}\n\n# merge with real environment variables taking priority:\nimport os\nmerged = {**read_dotenv(\".env\"), **os.environ}",
+    "citations": [
+      {
+        "file": "src/dotenv/main.py",
+        "line": 438
+      },
+      {
+        "file": "src/dotenv/main.py",
+        "line": 448
+      },
+      {
+        "file": "src/dotenv/main.py",
+        "line": 462
+      },
+      {
+        "file": "src/dotenv/__init__.py",
+        "line": 3
+      },
+      {
+        "file": "README.md",
+        "line": 82
+      },
+      {
+        "file": "README.md",
+        "line": 87
+      }
+    ],
+    "warnings": [
+      "README.md 'Load configuration without altering the environment' (lines 80-104) uses `dotenv_values`. That function no longer exists. The code defines and exports `read_dotenv` instead, so `from dotenv import dotenv_values` will fail with ImportError. Use `read_dotenv`.",
+      "README.md line 107 ('Parse configuration as a stream') also refers to `dotenv_values`. Use `read_dotenv(stream=...)`."
+    ],
+    "confidence": 0.95
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "data": {
+    "replacements": [
+      {
+        "line": 143,
+        "new_text": "Set `PYTHON_DOTENV_DISABLED=1` to disable `load_dotenv()` from loading .env"
+      },
+      {
+        "line": 144,
+        "new_text": "files. Useful when you can't modify third-party package calls or in"
+      }
+    ],
+    "summary": "Removed the reference to streams from the PYTHON_DOTENV_DISABLED description, since load_dotenv() no longer accepts a stream parameter."
+  }
+}

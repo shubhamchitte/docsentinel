@@ -1,0 +1,12 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.95,
+    "reason": "The text says \"`load_dotenv` and `dotenv_values` accept streams via their `stream` argument\" and the example calls `load_dotenv(stream=config)`, but the `stream` parameter was removed from both functions, so that call would raise a TypeError.",
+    "stale_lines": [
+      107,
+      108,
+      117
+    ]
+  }
+}

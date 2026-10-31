@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.93,
+    "reason": "The section only discusses override and value precedence for load_dotenv and dotenv_values, none of which involve the removed `stream` parameter, so every statement is still true.",
+    "stale_lines": []
+  }
+}

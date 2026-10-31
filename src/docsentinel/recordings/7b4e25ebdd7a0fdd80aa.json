@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The change only renames the disabling env var in the docstring and log message, and this README section never mentions it, so every statement is still true.",
+    "stale_lines": []
+  }
+}

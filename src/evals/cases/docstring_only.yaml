@@ -1,0 +1,9 @@
+name: docstring_only
+description: Trap. Only a docstring changes; public API is identical.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: "Parse a .env file and then load all the variables found as environment variables."
+    replace: "Read a .env file and export every variable it defines into the environment."
+expect:
+  stale: []

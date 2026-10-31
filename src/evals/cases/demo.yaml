@@ -1,0 +1,29 @@
+name: demo
+description: >
+  The main demo. One commit that a maintainer might plausibly make:
+  rename dotenv_values -> read_dotenv, make load_dotenv override by default,
+  rename the CLI's `list --format` to `list --output`, and an internal-only
+  rename that must NOT be flagged.
+config:
+  cli_name: dotenv
+edits:
+  - files: [src/dotenv/main.py, src/dotenv/__init__.py, src/dotenv/cli.py]
+    find: dotenv_values
+    replace: read_dotenv
+  - files: [src/dotenv/main.py]
+    find: "    override: bool = False,"
+    replace: "    override: bool = True,"
+  - files: [src/dotenv/cli.py]
+    find: '"--format",'
+    replace: '"--output",'
+  - files: [src/dotenv/main.py]
+    find: _walk_to_root
+    replace: _iter_parents
+expect:
+  stale:
+    - "README.md#Getting Started"
+    - "README.md#Command-line Interface"
+    - "README.md#Load configuration without altering the environment"
+    - "README.md#Parse configuration as a stream"
+    - "README.md#Variable without a value"
+    - "README.md#Variable expansion"

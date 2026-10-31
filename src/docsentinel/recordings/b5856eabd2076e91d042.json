@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The Getting Started section never mentions the removed `stream` parameter, and its statements about the defaults (finding .env, override=False) remain true with the new signature.",
+    "stale_lines": []
+  }
+}

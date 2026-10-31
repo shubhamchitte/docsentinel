@@ -1,0 +1,13 @@
+name: remove_param
+description: The `stream` parameter is removed from load_dotenv and dotenv_values.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: "    stream: Optional[IO[str]] = None,\n    verbose"
+    replace: "    verbose"
+expect:
+  stale:
+    - "README.md#Parse configuration as a stream"
+    # Added after the first eval run: the judge flagged this and was right --
+    # it says load_dotenv() loads ".env files or streams", untrue once `stream` is gone.
+    - "README.md#Disable load_dotenv"

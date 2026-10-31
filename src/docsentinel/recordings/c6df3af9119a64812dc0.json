@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.97,
+    "reason": "The section only describes passing a stream to load_dotenv, which still works as shown; the change only renamed the disable environment variable, which the section doesn't mention.",
+    "stale_lines": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.6,
+    "reason": "The section says \"With `load_dotenv(override=True)` or `dotenv_values()`\" the value follows the expansion order (.env, environment, default, empty string), but `interpolate` now defaults to False. Those calls no longer expand anything unless `interpolate=True` is passed, and the text never says so.",
+    "stale_lines": [
+      216,
+      218,
+      226
+    ]
+  }
+}

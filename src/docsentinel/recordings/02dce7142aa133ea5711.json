@@ -1,0 +1,10 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.97,
+    "reason": "Line 49 says load_dotenv() will \"Not override existing environment variables (`override=False`)\", but the new default is override=True, so existing variables are now overridden by default.",
+    "stale_lines": [
+      49
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+name: default_change
+description: >
+  load_dotenv(override) default flips False -> True. Many sections mention
+  load_dotenv; only the one that states the default is wrong.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py]
+    find: "    override: bool = False,"
+    replace: "    override: bool = True,"
+expect:
+  stale: ["README.md#Getting Started"]

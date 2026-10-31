@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.93,
+    "reason": "The section only describes dotenv_values and a dict-merge pattern, neither of which depends on load_dotenv's `override` default, so every statement still holds.",
+    "stale_lines": []
+  }
+}

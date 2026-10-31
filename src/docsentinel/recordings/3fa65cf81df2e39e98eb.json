@@ -1,0 +1,13 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.55,
+    "reason": "The new `list_values` sorts keys (`sorted(values)` and `sort_keys=True`), so the example would print EMAIL before USER, but the doc shows `USER=foo` then `EMAIL=foo@example.org` in both text and JSON output.",
+    "stale_lines": [
+      157,
+      158,
+      161,
+      162
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "data": {
+    "approve": false,
+    "problem": "Lines 157-158 and 161-162 reorder the example output to list EMAIL before USER, but the given code only shows the flag rename and gives no evidence that `list` output ordering changed."
+  }
+}

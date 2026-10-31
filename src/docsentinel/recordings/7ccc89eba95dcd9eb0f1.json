@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The section only says load_dotenv accepts a stream and shows a stream example, with no claim about override behavior, so the new override=True default doesn't contradict it.",
+    "stale_lines": []
+  }
+}

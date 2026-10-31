@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.9,
+    "reason": "The section is about valueless variables (dotenv_values gives None, load_dotenv ignores them), which doesn't depend on the changed override or interpolate defaults.",
+    "stale_lines": []
+  }
+}

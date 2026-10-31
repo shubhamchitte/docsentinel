@@ -1,0 +1,14 @@
+{
+  "data": {
+    "stale": true,
+    "confidence": 0.95,
+    "reason": "Line 49 says \"Not override existing environment variables (`override=False`)\", but the new default is override=True; and lines 66-71 show ${DOMAIN} expansion and claim variables are expanded, yet interpolate now defaults to False.",
+    "stale_lines": [
+      49,
+      66,
+      67,
+      70,
+      71
+    ]
+  }
+}

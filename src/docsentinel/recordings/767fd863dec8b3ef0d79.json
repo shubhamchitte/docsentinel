@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.95,
+    "reason": "The section only describes how dotenv_values and load_dotenv treat valueless variables (None vs ignored) and never mentions the removed `stream` parameter, so every statement is still true.",
+    "stale_lines": []
+  }
+}

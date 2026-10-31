@@ -1,0 +1,23 @@
+{
+  "data": {
+    "replacements": [
+      {
+        "line": 157,
+        "new_text": "EMAIL=foo@example.org"
+      },
+      {
+        "line": 158,
+        "new_text": "USER=foo"
+      },
+      {
+        "line": 161,
+        "new_text": "  \"EMAIL\": \"foo@example.org\","
+      },
+      {
+        "line": 162,
+        "new_text": "  \"USER\": \"foo\""
+      }
+    ],
+    "summary": "Reordered the `dotenv list` example output (text and JSON) so keys appear sorted, with EMAIL before USER."
+  }
+}

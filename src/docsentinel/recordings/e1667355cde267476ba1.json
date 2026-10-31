@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.96,
+    "reason": "The section only describes how valueless variables are treated by dotenv_values and load_dotenv, and the change only renamed the disable env var, so every statement still holds.",
+    "stale_lines": []
+  }
+}

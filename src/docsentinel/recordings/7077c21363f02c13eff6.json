@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.96,
+    "reason": "The section only describes dotenv_values returning a dict without touching the environment; it doesn't mention the disable environment variable, so the rename from PYTHON_DOTENV_DISABLED to DOTENV_DISABLED doesn't contradict it.",
+    "stale_lines": []
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "data": {
+    "stale": false,
+    "confidence": 0.9,
+    "reason": "The section passes `override=True` and `override=False` explicitly and never states a default, so the new default of True doesn't contradict anything in it.",
+    "stale_lines": []
+  }
+}

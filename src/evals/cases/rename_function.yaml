@@ -1,0 +1,13 @@
+name: rename_function
+description: Public function renamed everywhere in code.
+config: {cli_name: dotenv}
+edits:
+  - files: [src/dotenv/main.py, src/dotenv/__init__.py, src/dotenv/cli.py]
+    find: dotenv_values
+    replace: read_dotenv
+expect:
+  stale:
+    - "README.md#Load configuration without altering the environment"
+    - "README.md#Parse configuration as a stream"
+    - "README.md#Variable without a value"
+    - "README.md#Variable expansion"
