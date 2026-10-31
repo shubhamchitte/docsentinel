@@ -1,0 +1,29 @@
+# Reproducible setup, run and test commands, executed in this order
+# from a fresh checkout.
+# Keep every command non-interactive (no prompts) and idempotent.
+
+setup_commands:
+  - "pip install -r requirements.txt"
+  # Claude Code CLI for live LLM calls. If npm is missing this fails softly and
+  # DocSentinel falls back to recorded LLM responses (see notes).
+  - "npm install -g @anthropic-ai/claude-code@2.1.299 || echo 'claude CLI not installed - replay mode will be used'"
+
+run_commands:
+  - "python src/main.py doctor"
+  - "python src/main.py fix --case src/evals/cases/demo.yaml --out out/demo --branch"
+  - "python src/main.py eval"
+  - "python src/main.py hooks-demo"
+  - "python src/main.py mcp-demo"
+  - "python src/main.py ask \"How do I read a .env file into a dict without changing os.environ?\" --case src/evals/cases/demo.yaml --out out/ask"
+
+test_commands:
+  - "python src/tests/run_all.py"
+
+notes: >
+  Supported Python: 3.10 or newer (CI runs this file on 3.10-3.14, with and without CLAUDE_KEY).
+  Needs no Slack, no GitHub token and no network service other than the LLM (optional).
+  LLM calls go through `claude -p`. CLAUDE_KEY is mapped to the variable the CLI
+  reads (sk-ant-oat... -> CLAUDE_CODE_OAUTH_TOKEN, else ANTHROPIC_API_KEY).
+  If the CLI or key is unavailable, DocSentinel replays recorded responses from
+  src/docsentinel/recordings/ and says so in its output. Force a mode with
+  DOCSENTINEL_LLM=live or DOCSENTINEL_LLM=replay.

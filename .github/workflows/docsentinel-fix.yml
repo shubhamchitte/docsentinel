@@ -1,0 +1,240 @@
+# Reusable workflow: fix mode. After a push to the default branch, opens a DRAFT PR
+# with verified doc fixes. Never pushes to the default branch, never merges.
+#   analyze  LLM agents, READ-ONLY token
+#   open-pr  no LLM; the only job with contents:write
+# Needs the repo setting "Allow GitHub Actions to create and approve pull requests".
+
+name: DocSentinel fix (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      docsentinel_repo:
+        description: Where DocSentinel lives (owner/repo)
+        type: string
+        default: shubhamchitte/docsentinel
+      docsentinel_ref:
+        type: string
+        required: true
+      config:
+        type: string
+        default: .docsentinel.yml
+      max_sections:
+        type: number
+        default: 20
+      merge_sha:
+        description: Re-run fix mode for this merge commit (workflow_dispatch). Empty = the pushed commit.
+        type: string
+        default: ""
+    secrets:
+      CLAUDE_KEY:
+        required: false
+      DOCSENTINEL_READ_TOKEN:  # only when DocSentinel lives in another private repo (read-only, contents)
+        required: false
+      SLACK_WEBHOOK_URL:
+        required: false
+
+permissions: {}
+
+jobs:
+  analyze:
+    # Loop guard: never react to DocSentinel's own merges.
+    # New branches have no "before" commit: nothing to compare, so skip (don't fail).
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.merge_sha != '') ||
+      (github.event_name == 'push' &&
+       !github.event.created &&
+       github.event.before != '0000000000000000000000000000000000000000' &&
+       !startsWith(github.event.head_commit.message, 'docs: sync'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read        # download the PR check's artifact (reuse its verdicts)
+      pull-requests: read  # find the PR this push merged
+    timeout-minutes: 15
+    env:
+      MERGE_SHA: ${{ inputs.merge_sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Which change (pushed commit, or a merge commit given by hand)
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -n "$MERGE_SHA" ]; then
+            echo "HEAD_SHA=$MERGE_SHA" >> "$GITHUB_ENV"; echo "BASE_SHA=$(git rev-parse "$MERGE_SHA^1")" >> "$GITHUB_ENV"
+          else
+            echo "HEAD_SHA=$GITHUB_SHA" >> "$GITHUB_ENV"; echo "BASE_SHA=$BEFORE" >> "$GITHUB_ENV"
+          fi
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Get DocSentinel (pinned commit; private repo)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: ${{ inputs.docsentinel_repo }}
+          ref: ${{ inputs.docsentinel_ref }}
+          # Same repo: github.token can read it. Another repo: a read-only token or a GitHub App token.
+          token: ${{ secrets.DOCSENTINEL_READ_TOKEN || github.token }}
+          path: .docsentinel-tool
+          persist-credentials: false
+      - name: Install DocSentinel
+        run: pip install ./.docsentinel-tool
+      - name: Install Claude CLI (pinned) if a key is available
+        id: llm
+        env:
+          HAS_KEY: ${{ secrets.CLAUDE_KEY != '' }}
+        run: |
+          if [ "$HAS_KEY" = "true" ]; then
+            npm install -g @anthropic-ai/claude-code@2.1.299
+            echo "flags=" >> "$GITHUB_OUTPUT"
+          else
+            echo "flags=--no-llm" >> "$GITHUB_OUTPUT"
+            echo "> LLM skipped: no CLAUDE_KEY. Only certain (rule-based) fixes are proposed." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Find the PR check's verdicts (judge once, act on the same verdict)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: |
+          # Trust only an artifact made by THIS repo's DocSentinel workflow, on a non-fork PR run,
+          # for the merged PR's head SHA. Anything missing -> re-judge (never fail).
+          wf_path=$(echo "$WORKFLOW_REF" | sed -E 's|^[^/]+/[^/]+/||; s|@.*$||')
+          pr_head=$(gh api "repos/$REPO/commits/$HEAD_SHA/pulls" -q '.[0].head.sha' 2>/dev/null || true)
+          run_id=""
+          if [ -n "$pr_head" ]; then
+            run_id=$(gh api "repos/$REPO/actions/runs?head_sha=$pr_head&event=pull_request&status=success" \
+              -q "[.workflow_runs[] | select(.path == \"$wf_path\" and .head_repository.full_name == \"$REPO\")][0].id // empty" 2>/dev/null || true)
+          fi
+          if [ -n "$run_id" ] && gh run download "$run_id" -R "$REPO" -n docsentinel -D "$RUNNER_TEMP/prior" 2>/dev/null \
+              && [ -f "$RUNNER_TEMP/prior/report.json" ]; then
+            echo "REUSE=--reuse $RUNNER_TEMP/prior/report.json" >> "$GITHUB_ENV"
+            echo "> Reusing verdicts from PR check run $run_id (if the merged change is identical)." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "> No PR check result found for this push: judging fresh." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Propose verified fixes
+        env:
+          CLAUDE_KEY: ${{ secrets.CLAUDE_KEY }}
+          CONFIG: ${{ inputs.config }}
+          MAX: ${{ inputs.max_sections }}
+          FLAGS: ${{ steps.llm.outputs.flags }}
+        run: |
+          git show "$BASE_SHA:$CONFIG" > "$RUNNER_TEMP/docsentinel.yml" 2>/dev/null || echo "{}" > "$RUNNER_TEMP/docsentinel.yml"
+          docsentinel fix --repo . --base "$BASE_SHA" --head "$HEAD_SHA" --config "$RUNNER_TEMP/docsentinel.yml" \
+            --max-sections "$MAX" --out out $FLAGS $REUSE
+          cat out/report.md out/fix.md >> "$GITHUB_STEP_SUMMARY"
+          echo "$HEAD_SHA" > out/head_sha
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: docsentinel
+          path: out/
+
+  open-pr:
+    needs: analyze
+    runs-on: ubuntu-latest
+    # One writer per merge commit at a time: a push run and a manual re-run for the same merge
+    # queue instead of racing on the same docs-sentinel/<sha> branch. Different merges run in parallel.
+    concurrency:
+      group: docsentinel-fix-${{ github.repository }}-${{ inputs.merge_sha || github.sha }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      HAS_SLACK: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: docsentinel
+          path: out
+      - name: Open or update the draft PR (one per merge commit)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET: ${{ github.ref_name }}  # the branch that was pushed (usually the default branch)
+          BOT_EMAIL: docsentinel@users.noreply.github.com
+        run: |
+          # Slack de-dup: a manual re-run (workflow_dispatch) only notifies if the draft is opened or updated.
+          [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ] && echo "NOTIFY=false" >> "$GITHUB_ENV"
+          if [ ! -s out/fix.patch ]; then echo "No verified fixes." | tee -a "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          sha=$(cat out/head_sha); short=${sha::7}
+          branch="docs-sentinel/$short"   # keyed by the merge commit: re-runs find the same draft
+          # Never commit to the base branch: fixes go only onto the docs-sentinel/* branch.
+          [ "$branch" != "$TARGET" ] || { echo "refusing to write to $TARGET"; exit 1; }
+          git config user.name "docsentinel[bot]"
+          git config user.email "$BOT_EMAIL"
+
+          pr=$(gh pr list --head "$branch" --state all --json number,state,url -q '.[0] | "\(.number) \(.state) \(.url)"')
+          read -r num state url <<< "$pr"
+          if [ "$state" = "MERGED" ] || [ "$state" = "CLOSED" ]; then
+            echo "Draft PR #$num for this merge is already $state (a human decided). Nothing to do." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "NOTIFY=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          git switch -c "$branch"
+          git apply out/fix.patch
+          git commit -qam "docs: sync with $short (DocSentinel)"
+
+          if [ -n "$num" ] && git fetch -q origin "+refs/heads/$branch:refs/remotes/origin/$branch" 2>/dev/null; then
+            # A draft already exists for this merge. Only ever update the bot's own work.
+            # Authors come from the PR's own commit list (not local history, which is shallow here).
+            human=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$num/commits" -q '.[].commit.author.email' \
+                    | grep -vx "$BOT_EMAIL" | head -1 || true)
+            if [ -n "$human" ]; then
+              msg="DocSentinel ran again for \`$short\`. This draft has human edits, so they were **not** overwritten. The latest suggestion is in [this run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)."
+              gh pr comment "$num" --body "$msg" --edit-last 2>/dev/null || gh pr comment "$num" --body "$msg"  # one comment, updated
+              echo "Draft PR #$num has human edits: left unchanged, commented instead." | tee -a "$GITHUB_STEP_SUMMARY"
+              echo "NOTIFY=false" >> "$GITHUB_ENV"
+            elif git diff --quiet "origin/$branch" HEAD -- .; then
+              gh pr edit "$num" --body-file out/fix.md >/dev/null
+              echo "Draft PR #$num already has these fixes: description refreshed, no new PR." | tee -a "$GITHUB_STEP_SUMMARY"
+              echo "NOTIFY=false" >> "$GITHUB_ENV"
+            else
+              git push -q --force-with-lease="$branch:origin/$branch" origin "$branch"
+              gh pr edit "$num" --body-file out/fix.md >/dev/null
+              echo "Draft PR #$num updated with the latest fixes (no new PR)." | tee -a "$GITHUB_STEP_SUMMARY"
+              echo "NOTIFY=true" >> "$GITHUB_ENV"
+            fi
+          else
+            git push -q -u origin "$branch"
+            url=$(gh pr create --draft --base "$TARGET" --head "$branch" \
+              --title "docs: sync with $short" --body-file out/fix.md)
+            echo "Opened draft PR $url" | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "NOTIFY=true" >> "$GITHUB_ENV"
+          fi
+          echo "FIX_PR_URL=${url:-$(gh pr list --head "$branch" --json url -q '.[0].url')}" >> "$GITHUB_ENV"
+      - name: Get DocSentinel (pinned commit; private repo)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: ${{ env.HAS_SLACK == 'true' && env.NOTIFY != 'false' }}
+        with:
+          repository: ${{ inputs.docsentinel_repo }}
+          ref: ${{ inputs.docsentinel_ref }}
+          # Same repo: github.token can read it. Another repo: a read-only token or a GitHub App token.
+          token: ${{ secrets.DOCSENTINEL_READ_TOKEN || github.token }}
+          path: .docsentinel-tool
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        if: ${{ env.HAS_SLACK == 'true' && env.NOTIFY != 'false' }}
+        with:
+          python-version: "3.12"
+      - name: Notify Slack (counts and links only)
+        if: ${{ env.HAS_SLACK == 'true' && env.NOTIFY != 'false' }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}  # the URL is the credential: secret only, never logged
+          REF: ${{ inputs.docsentinel_ref }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          SERVER: ${{ github.server_url }}
+        run: |
+          pip install -q ./.docsentinel-tool
+          sha=$(cat out/head_sha)
+          pr=$(gh api "repos/$REPO/commits/$sha/pulls" -q '.[0].html_url' 2>/dev/null || true)
+          if [ -n "$pr" ]; then where=(--pr-url "$pr"); else where=(--commit-url "$SERVER/$REPO/commit/$sha"); fi
+          docsentinel notify --report out/report.json --event fix --repo-name "$REPO" "${where[@]}" \
+            --fix-pr-url "${FIX_PR_URL:-}" --run-url "$RUN_URL"

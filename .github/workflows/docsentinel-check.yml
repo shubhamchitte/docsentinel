@@ -1,0 +1,161 @@
+# Reusable workflow: flag mode. Comments on a PR with the doc sections it makes stale.
+# Called from a target repo (see README "Install in a repo"). Two jobs:
+#   analyze  LLM agents, READ-ONLY token. PR code is parsed (ast), never executed or imported.
+#   comment  no LLM; the only job that writes (one PR comment, updated on each push).
+
+name: DocSentinel check (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      docsentinel_repo:
+        description: Where DocSentinel lives (owner/repo)
+        type: string
+        default: shubhamchitte/docsentinel
+      docsentinel_ref:
+        description: Commit SHA of DocSentinel to install (pin it; same SHA as in `uses:`)
+        type: string
+        required: true
+      config:
+        description: Settings file, read from the PR's BASE branch so a PR cannot change its own scope
+        type: string
+        default: .docsentinel.yml
+      max_sections:
+        description: Most doc sections sent to the LLM per run (cost cap)
+        type: number
+        default: 20
+    secrets:
+      CLAUDE_KEY:
+        required: false
+      DOCSENTINEL_READ_TOKEN:  # only when DocSentinel lives in another private repo (read-only, contents)
+        required: false
+      SLACK_WEBHOOK_URL:
+        required: false
+
+permissions: {}
+
+jobs:
+  analyze:
+    if: ${{ !startsWith(github.head_ref, 'docs-sentinel/') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - name: Get DocSentinel (pinned commit; private repo)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: ${{ inputs.docsentinel_repo }}
+          ref: ${{ inputs.docsentinel_ref }}
+          # Same repo: github.token can read it. Another repo: a read-only token or a GitHub App token.
+          token: ${{ secrets.DOCSENTINEL_READ_TOKEN || github.token }}
+          path: .docsentinel-tool
+          persist-credentials: false
+      - name: Install DocSentinel
+        run: pip install ./.docsentinel-tool
+      - name: Install Claude CLI (pinned) if a key is available
+        id: llm
+        env:
+          HAS_KEY: ${{ secrets.CLAUDE_KEY != '' }}
+        run: |
+          if [ "$HAS_KEY" = "true" ]; then
+            npm install -g @anthropic-ai/claude-code@2.1.299
+            echo "flags=" >> "$GITHUB_OUTPUT"
+          else
+            # Fork and Dependabot PRs get no Actions secrets: run rules only, never fail the PR.
+            echo "flags=--no-llm" >> "$GITHUB_OUTPUT"
+            echo "> LLM skipped: no CLAUDE_KEY available to this run (fork or Dependabot PR?). Rules-only results below." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Flag and propose fixes
+        env:
+          CLAUDE_KEY: ${{ secrets.CLAUDE_KEY }}
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          CONFIG: ${{ inputs.config }}
+          MAX: ${{ inputs.max_sections }}
+          FLAGS: ${{ steps.llm.outputs.flags }}
+        run: |
+          git show "$BASE:$CONFIG" > "$RUNNER_TEMP/docsentinel.yml" 2>/dev/null \
+            || { echo "{}" > "$RUNNER_TEMP/docsentinel.yml"; echo "> No $CONFIG on the base branch: using defaults." >> "$GITHUB_STEP_SUMMARY"; }
+          docsentinel fix --repo . --base "$BASE" --head "$HEAD" --config "$RUNNER_TEMP/docsentinel.yml" \
+            --max-sections "$MAX" --out out $FLAGS
+          cat out/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: docsentinel
+          path: out/
+
+  comment:
+    needs: analyze
+    # One comment writer per PR: a newer push's comment never interleaves with an older one.
+    concurrency:
+      group: docsentinel-comment-${{ github.repository }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    # Fork and Dependabot PRs get a read-only token: the job summary carries the report instead.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read        # check out DocSentinel for the Slack step
+      pull-requests: write
+    env:
+      HAS_SLACK: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: docsentinel
+          path: out
+      - name: Post or update the DocSentinel comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          {
+            cat out/report.md
+            if [ -s out/suggest.patch ]; then
+              echo; echo "<details><summary>Suggested doc edits (become a draft PR after merge, if fix mode is on; low-confidence ones are marked)</summary>"; echo
+              sed -n '/^### /,$p' out/fix.md; echo
+              echo '```diff'; cat out/suggest.patch; echo '```'; echo "</details>"
+            fi
+          } > body.md
+          # Same result as the last DocSentinel comment on this PR? Then nothing changed: don't re-notify.
+          prev=$(gh api "repos/$REPO/issues/$PR/comments" \
+                 -q '[.[] | select(.user.login == "github-actions[bot]")][-1].body // ""')
+          if [ "$prev" = "$(cat body.md)" ]; then echo "NOTIFY=false" >> "$GITHUB_ENV"; echo "Unchanged since last comment."; fi
+          gh pr comment "$PR" -R "$REPO" --body-file body.md --edit-last \
+            || gh pr comment "$PR" -R "$REPO" --body-file body.md
+      - name: Get DocSentinel (pinned commit; private repo)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: ${{ env.HAS_SLACK == 'true' && env.NOTIFY != 'false' }}
+        with:
+          repository: ${{ inputs.docsentinel_repo }}
+          ref: ${{ inputs.docsentinel_ref }}
+          # Same repo: github.token can read it. Another repo: a read-only token or a GitHub App token.
+          token: ${{ secrets.DOCSENTINEL_READ_TOKEN || github.token }}
+          path: .docsentinel-tool
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        if: ${{ env.HAS_SLACK == 'true' && env.NOTIFY != 'false' }}
+        with:
+          python-version: "3.12"
+      - name: Notify Slack (counts and links only)
+        if: ${{ env.HAS_SLACK == 'true' && env.NOTIFY != 'false' }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}  # the URL is the credential: secret only, never logged
+          REF: ${{ inputs.docsentinel_ref }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPO: ${{ github.repository }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          pip install -q ./.docsentinel-tool
+          docsentinel notify --report out/report.json --event flag --repo-name "$REPO" --pr-url "$PR_URL" --run-url "$RUN_URL"

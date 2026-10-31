@@ -1,0 +1,49 @@
+# DocSentinel on this repo, watching the demo project in src/demo_repo/python-dotenv.
+# Same caller snippet a target repo uses (README "Install in a repo"); here the reusable
+# workflows are referenced locally and DocSentinel is installed from the BASE commit: fork PRs
+# can't change the code that judges them; same-repo writers are trusted, and CODEOWNERS protects
+# merges, not runs.
+# Kill switch: repo variable DOCSENTINEL_ENABLED=false (instant, no commit needed).
+
+name: DocSentinel
+
+on:
+  pull_request:
+    paths: ["src/demo_repo/python-dotenv/**"]
+  push:
+    branches: [main]
+    paths: ["src/demo_repo/python-dotenv/**"]
+
+permissions: {}
+
+concurrency:
+  group: docsentinel-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: vars.DOCSENTINEL_ENABLED != 'false' && github.event_name == 'pull_request'
+    uses: ./.github/workflows/docsentinel-check.yml
+    permissions:
+      contents: read
+      pull-requests: write
+    with:
+      docsentinel_ref: ${{ github.event.pull_request.base.sha }}
+      config: src/demo_repo/docsentinel.yml
+    secrets:
+      CLAUDE_KEY: ${{ secrets.CLAUDE_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  fix:
+    if: vars.DOCSENTINEL_ENABLED != 'false' && github.event_name == 'push'
+    uses: ./.github/workflows/docsentinel-fix.yml
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: read
+    with:
+      docsentinel_ref: ${{ github.event.before }}
+      config: src/demo_repo/docsentinel.yml
+    secrets:
+      CLAUDE_KEY: ${{ secrets.CLAUDE_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
