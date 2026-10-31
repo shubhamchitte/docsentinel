@@ -1,0 +1,4 @@
+Vendored snapshot of https://github.com/theskumar/python-dotenv
+Tag: v1.2.4 (commit a565c2cc41599c48eabc6b7b7f5b826d43c5a6d7)
+License: BSD-3-Clause (see LICENSE)
+Used only as the demo target for DocSentinel. Unmodified.

@@ -1,0 +1,6 @@
+# DocSentinel settings for running on this fork, where the demo project lives
+# under src/demo_repo/python-dotenv/. Used by .github/workflows/docsentinel.yml.
+code: ["src/demo_repo/python-dotenv/src/*.py", "src/demo_repo/python-dotenv/src/**/*.py"]
+docs: ["src/demo_repo/python-dotenv/README.md"]
+exclude: ["**/CHANGELOG*", "**/tests/**"]
+cli_name: dotenv
