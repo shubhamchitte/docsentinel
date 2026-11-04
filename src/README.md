@@ -22,8 +22,9 @@ docsentinel/
   cli.py                the commands; trial = dry run on history, notify = send a report to Slack/webhooks
   config.py, gitio.py, report.py
 evals/cases/            11 eval cases (code edits + expected answer)
-tests/                  run_all.py runs both suites (no network, no LLM):
+tests/                  run_all.py runs every suite (no network, no LLM):
                         test_guardrails.py  bad fixes, webhook signing, Slack content
                         test_workflows.py   real workflow shell steps vs a local git remote + stub gh
+                        test_mcp_server.py  MCP tools registered, read-only, annotated
 demo_repo/              python-dotenv v1.2.4 snapshot + settings for the GitHub Action
 ```

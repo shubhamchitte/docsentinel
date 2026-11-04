@@ -20,7 +20,9 @@ from . import concierge, gitio, judge, report
 from .config import Config
 from .flag import flag
 
-READ_ONLY = ToolAnnotations(read_only_hint=True, destructive_hint=False)
+# Same base..head always gives the same answer (drift is cached), and tools only read the local repo.
+READ_ONLY = ToolAnnotations(read_only_hint=True, destructive_hint=False,
+                            idempotent_hint=True, open_world_hint=False)
 
 
 def build(repo: Path, cfg: Config) -> MCPServer:

@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent
-SUITES = ["test_guardrails.py", "test_workflows.py"]
+SUITES = ["test_guardrails.py", "test_workflows.py", "test_mcp_server.py"]
 
 
 def main() -> int:
