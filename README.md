@@ -18,7 +18,7 @@ Rules (`ast`-based change detection and a code-to-doc map) handle what is certai
 
 ## Key results
 
-Precision **100%** and recall **94%** on 11 eval cases (rules alone: 45% precision). **25/25** tests pass with one command. On the real python-dotenv it caught 2 of 3 historical drift commits, and on httpx it found [doc drift that is still there today](docs/evidence.md#second-repo-encodehttpx-overfitting-check).
+Precision **100%** and recall **94%** on 11 eval cases (rules alone: 45% precision). **32/32** tests pass with one command. On the real python-dotenv it caught 2 of 3 historical drift commits, and on httpx it found [doc drift that is still there today](docs/evidence.md#second-repo-encodehttpx-overfitting-check).
 
 Read next: [design write-up with the diagram](docs/README.md) · [evidence](docs/evidence.md) · [`run.yaml`](run.yaml) (reproducible setup/run/test commands) · [install in your repo](docs/install.md)
 
@@ -52,7 +52,7 @@ python src/main.py fix --case src/evals/cases/demo.yaml --out out/demo
 python src/main.py ask "How do I read a .env file into a dict without changing os.environ?" \
     --case src/evals/cases/demo.yaml --out out/ask
 python src/main.py eval                         # scorecard over 11 cases
-python src/tests/run_all.py                     # all tests: guardrails + workflow behaviour (25)
+python src/tests/run_all.py                     # all tests: guardrails + workflow behaviour + MCP server (32)
 ```
 
 `--case` builds a throwaway git repo: python-dotenv as `base`, then the case's code edits as `head`. The demo case renames `dotenv_values`, flips the `load_dotenv(override=...)` default, renames the CLI option `list --format`, and renames a private helper (which must not be flagged).
@@ -67,7 +67,7 @@ What you get in `out/demo/`:
 
 ## Tests
 
-`python src/tests/run_all.py` runs 25 tests with no network and no LLM: fix guardrails (rejecting new URLs or shell commands), webhook signing, fork-PR handling, and the real workflow shell steps against a local git remote. CI runs `run.yaml` on Python 3.10 to 3.14.
+`python src/tests/run_all.py` runs 32 tests with no network and no LLM: fix guardrails (rejecting new URLs or shell commands), webhook signing, fork-PR handling, the real workflow shell steps against a local git remote, and the MCP server contract (both tools registered and annotated read-only, idempotent and closed-world). CI runs `run.yaml` on Python 3.10 to 3.14.
 
 ## Project layout
 

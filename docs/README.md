@@ -39,13 +39,14 @@ I started from GitHub's `agentics` **update-docs** workflow: one LLM pass over a
 | Recall | 100% | **94%** |
 | Traps clean | 2/3 | **3/3** |
 
-Fixes: 15 of 19 stale or REVIEW sections got a fix that passed the Verifier and the Fix Reviewer. 2 were declined by the Fixer and 2 rejected by the Reviewer ([example](evidence.md#guardrail-example-the-second-ai-rejects-a-fix-it-cant-verify)). **`python src/tests/run_all.py` runs 25 tests**, with no network and no LLM:
+Fixes: 15 of 19 stale or REVIEW sections got a fix that passed the Verifier and the Fix Reviewer. 2 were declined by the Fixer and 2 rejected by the Reviewer ([example](evidence.md#guardrail-example-the-second-ai-rejects-a-fix-it-cant-verify)). **`python src/tests/run_all.py` runs 32 tests**, with no network and no LLM:
 - bad fixes rejected, including ones that add a new URL or shell command;
 - webhook signature, tampering, replay and plain-http handling;
 - Slack never carries doc text;
 - cap reporting;
 - fork PRs running rules-only;
-- and the real workflow shell steps against a local git remote: idempotent re-runs, human-edit protection, and merged drafts left alone.
+- and the real workflow shell steps against a local git remote: idempotent re-runs, human-edit protection, and merged drafts left alone;
+- the MCP server exposes exactly `ask_docs` and `check_docs`, both annotated read-only, non-destructive, idempotent and closed-world.
 
 The suite is small and I wrote it myself, so treat it as a health check, not a benchmark.
 
